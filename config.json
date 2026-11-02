@@ -7,7 +7,7 @@
   "track": {
     "title": "Lagu Kita",
     "artist": "Teman scroll di galeri ini",
-    "file": "audio/lagu.mp3"
+    "file": "lagu.mp3"
   },
   "sosmed": [
     {
@@ -35,44 +35,44 @@
     "Jalan-jalan"
   ],
   "hero": [
-    "photos/08.jpg",
-    "photos/09.jpg",
-    "photos/04.jpg"
+    "08.jpg",
+    "09.jpg",
+    "04.jpg"
   ],
-  "cover": "photos/09.jpg",
+  "cover": "09.jpg",
   "moments": [
     {
-      "file": "photos/04.jpg",
+      "file": "04.jpg",
       "k": "Photobooth",
       "title": "Empat jepretan",
       "text": "Dua strip foto dan kenangan yang bisa dipegang."
     },
     {
-      "file": "photos/08.jpg",
+      "file": "08.jpg",
       "k": "Asia Afrika",
       "title": "Di bawah bola dunia",
       "text": "Dunia luas, tapi berdua rasanya cukup."
     },
     {
-      "file": "photos/07.jpg",
+      "file": "07.jpg",
       "k": "Bandung",
       "title": "Dinding berkata",
       "text": "Kita berdiri diam dan membaca kalimat di dinding."
     },
     {
-      "file": "photos/11.jpg",
+      "file": "11.jpg",
       "k": "Malam",
       "title": "Lampu neon",
       "text": "Jalan ramai, warna biru dan oranye di mana-mana."
     },
     {
-      "file": "photos/03.jpg",
+      "file": "03.jpg",
       "k": "Selfie",
       "title": "Tanpa rencana",
       "text": "Satu foto cepat yang jadi favorit."
     },
     {
-      "file": "photos/12.jpg",
+      "file": "12.jpg",
       "k": "Santai",
       "title": "Es kopi dan senyum",
       "text": "Hal kecil yang bikin hari terasa ringan."
@@ -80,7 +80,7 @@
   ],
   "photos": [
     {
-      "file": "photos/01.jpg",
+      "file": "01.jpg",
       "w": 748,
       "h": 1024,
       "title": "Gaya santai",
@@ -90,7 +90,7 @@
       ]
     },
     {
-      "file": "photos/02.jpg",
+      "file": "02.jpg",
       "w": 1440,
       "h": 1080,
       "title": "Selfie malam",
@@ -100,7 +100,7 @@
       ]
     },
     {
-      "file": "photos/03.jpg",
+      "file": "03.jpg",
       "w": 1440,
       "h": 1080,
       "title": "Selfie malam 2",
@@ -110,7 +110,7 @@
       ]
     },
     {
-      "file": "photos/04.jpg",
+      "file": "04.jpg",
       "w": 844,
       "h": 1500,
       "title": "Photobooth",
@@ -121,7 +121,7 @@
       ]
     },
     {
-      "file": "photos/05.jpg",
+      "file": "05.jpg",
       "w": 844,
       "h": 1500,
       "title": "Cermin lengkung",
@@ -133,7 +133,7 @@
       ]
     },
     {
-      "file": "photos/06.jpg",
+      "file": "06.jpg",
       "w": 844,
       "h": 1500,
       "title": "Menyeberang",
@@ -143,7 +143,7 @@
       ]
     },
     {
-      "file": "photos/07.jpg",
+      "file": "07.jpg",
       "w": 1500,
       "h": 1000,
       "title": "Depan dinding kata",
@@ -154,7 +154,7 @@
       ]
     },
     {
-      "file": "photos/08.jpg",
+      "file": "08.jpg",
       "w": 1000,
       "h": 1500,
       "title": "Asia Afrika",
@@ -165,7 +165,7 @@
       ]
     },
     {
-      "file": "photos/09.jpg",
+      "file": "09.jpg",
       "w": 1000,
       "h": 1500,
       "title": "Berdiri berdua",
@@ -176,7 +176,7 @@
       ]
     },
     {
-      "file": "photos/10.jpg",
+      "file": "10.jpg",
       "w": 1000,
       "h": 1500,
       "title": "Pose santai",
@@ -187,7 +187,7 @@
       ]
     },
     {
-      "file": "photos/11.jpg",
+      "file": "11.jpg",
       "w": 844,
       "h": 1500,
       "title": "Neon malam",
@@ -198,7 +198,7 @@
       ]
     },
     {
-      "file": "photos/12.jpg",
+      "file": "12.jpg",
       "w": 844,
       "h": 1500,
       "title": "Es kopi",
@@ -208,7 +208,7 @@
       ]
     },
     {
-      "file": "photos/13.jpg",
+      "file": "13.jpg",
       "w": 1230,
       "h": 692,
       "title": "Di atas jembatan",
@@ -218,7 +218,7 @@
       ]
     },
     {
-      "file": "photos/14.jpg",
+      "file": "14.jpg",
       "w": 720,
       "h": 1280,
       "title": "Selfie cermin",
@@ -229,7 +229,7 @@
       ]
     },
     {
-      "file": "photos/15.jpg",
+      "file": "15.jpg",
       "w": 720,
       "h": 1280,
       "title": "Dari balik cermin",
