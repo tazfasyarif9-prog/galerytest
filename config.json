@@ -32,7 +32,8 @@
     "Photobooth",
     "Potret",
     "Cermin",
-    "Jalan-jalan"
+    "Jalan-jalan",
+    "Baru"
   ],
   "hero": [
     "08.jpg",
@@ -237,6 +238,36 @@
       "tags": [
         "Cermin",
         "Berdua"
+      ]
+    },
+    {
+      "file": "photos/mvyqmi3w-0.jpg",
+      "w": 1024,
+      "h": 1536,
+      "title": "Foto baru",
+      "alt": "Foto baru",
+      "tags": [
+        "Baru"
+      ]
+    },
+    {
+      "file": "photos/mvyqml5y-1.jpg",
+      "w": 1024,
+      "h": 1536,
+      "title": "Foto baru",
+      "alt": "Foto baru",
+      "tags": [
+        "Baru"
+      ]
+    },
+    {
+      "file": "photos/mvyqmnyp-2.jpg",
+      "w": 1200,
+      "h": 1600,
+      "title": "Foto baru",
+      "alt": "Foto baru",
+      "tags": [
+        "Baru"
       ]
     }
   ]
