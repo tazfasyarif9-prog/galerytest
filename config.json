@@ -1,0 +1,243 @@
+{
+  "names": [
+    "Shiren",
+    "Dia"
+  ],
+  "since": "2025-01-01",
+  "track": {
+    "title": "Lagu Kita",
+    "artist": "Teman scroll di galeri ini",
+    "file": "audio/lagu.mp3"
+  },
+  "sosmed": [
+    {
+      "key": "instagram",
+      "label": "Instagram",
+      "url": "https://www.instagram.com/"
+    },
+    {
+      "key": "tiktok",
+      "label": "TikTok",
+      "url": "https://www.tiktok.com/"
+    },
+    {
+      "key": "whatsapp",
+      "label": "WhatsApp",
+      "url": "https://wa.me/"
+    }
+  ],
+  "albums": [
+    "Berdua",
+    "Bandung",
+    "Photobooth",
+    "Potret",
+    "Cermin",
+    "Jalan-jalan"
+  ],
+  "hero": [
+    "photos/08.jpg",
+    "photos/09.jpg",
+    "photos/04.jpg"
+  ],
+  "cover": "photos/09.jpg",
+  "moments": [
+    {
+      "file": "photos/04.jpg",
+      "k": "Photobooth",
+      "title": "Empat jepretan",
+      "text": "Dua strip foto dan kenangan yang bisa dipegang."
+    },
+    {
+      "file": "photos/08.jpg",
+      "k": "Asia Afrika",
+      "title": "Di bawah bola dunia",
+      "text": "Dunia luas, tapi berdua rasanya cukup."
+    },
+    {
+      "file": "photos/07.jpg",
+      "k": "Bandung",
+      "title": "Dinding berkata",
+      "text": "Kita berdiri diam dan membaca kalimat di dinding."
+    },
+    {
+      "file": "photos/11.jpg",
+      "k": "Malam",
+      "title": "Lampu neon",
+      "text": "Jalan ramai, warna biru dan oranye di mana-mana."
+    },
+    {
+      "file": "photos/03.jpg",
+      "k": "Selfie",
+      "title": "Tanpa rencana",
+      "text": "Satu foto cepat yang jadi favorit."
+    },
+    {
+      "file": "photos/12.jpg",
+      "k": "Santai",
+      "title": "Es kopi dan senyum",
+      "text": "Hal kecil yang bikin hari terasa ringan."
+    }
+  ],
+  "photos": [
+    {
+      "file": "photos/01.jpg",
+      "w": 748,
+      "h": 1024,
+      "title": "Gaya santai",
+      "alt": "Potret santai memakai kacamata hitam di dalam toko",
+      "tags": [
+        "Potret"
+      ]
+    },
+    {
+      "file": "photos/02.jpg",
+      "w": 1440,
+      "h": 1080,
+      "title": "Selfie malam",
+      "alt": "Selfie berdua di malam hari",
+      "tags": [
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/03.jpg",
+      "w": 1440,
+      "h": 1080,
+      "title": "Selfie malam 2",
+      "alt": "Selfie berdua dengan latar tanaman",
+      "tags": [
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/04.jpg",
+      "w": 844,
+      "h": 1500,
+      "title": "Photobooth",
+      "alt": "Dua strip foto photobooth",
+      "tags": [
+        "Photobooth",
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/05.jpg",
+      "w": 844,
+      "h": 1500,
+      "title": "Cermin lengkung",
+      "alt": "Berdua terpantul di cermin lengkung merah",
+      "tags": [
+        "Photobooth",
+        "Cermin",
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/06.jpg",
+      "w": 844,
+      "h": 1500,
+      "title": "Menyeberang",
+      "alt": "Suasana jalan di depan dinding berisi kutipan",
+      "tags": [
+        "Bandung"
+      ]
+    },
+    {
+      "file": "photos/07.jpg",
+      "w": 1500,
+      "h": 1000,
+      "title": "Depan dinding kata",
+      "alt": "Berdua dari belakang menghadap dinding kutipan",
+      "tags": [
+        "Bandung",
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/08.jpg",
+      "w": 1000,
+      "h": 1500,
+      "title": "Asia Afrika",
+      "alt": "Berdua saling menatap di dekat bola dunia",
+      "tags": [
+        "Bandung",
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/09.jpg",
+      "w": 1000,
+      "h": 1500,
+      "title": "Berdiri berdua",
+      "alt": "Berdua berpose di dekat bola dunia",
+      "tags": [
+        "Bandung",
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/10.jpg",
+      "w": 1000,
+      "h": 1500,
+      "title": "Pose santai",
+      "alt": "Berdua menoleh ke samping dengan jalan ramai di belakang",
+      "tags": [
+        "Bandung",
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/11.jpg",
+      "w": 844,
+      "h": 1500,
+      "title": "Neon malam",
+      "alt": "Bangunan berlampu neon biru dan oranye di malam hari",
+      "tags": [
+        "Bandung",
+        "Potret"
+      ]
+    },
+    {
+      "file": "photos/12.jpg",
+      "w": 844,
+      "h": 1500,
+      "title": "Es kopi",
+      "alt": "Tersenyum sambil memegang es kopi",
+      "tags": [
+        "Potret"
+      ]
+    },
+    {
+      "file": "photos/13.jpg",
+      "w": 1230,
+      "h": 692,
+      "title": "Di atas jembatan",
+      "alt": "Foto miring di jembatan dekat danau",
+      "tags": [
+        "Jalan-jalan"
+      ]
+    },
+    {
+      "file": "photos/14.jpg",
+      "w": 720,
+      "h": 1280,
+      "title": "Selfie cermin",
+      "alt": "Selfie di depan cermin besar",
+      "tags": [
+        "Cermin",
+        "Potret"
+      ]
+    },
+    {
+      "file": "photos/15.jpg",
+      "w": 720,
+      "h": 1280,
+      "title": "Dari balik cermin",
+      "alt": "Berdua terlihat di cermin dengan lampu malam",
+      "tags": [
+        "Cermin",
+        "Berdua"
+      ]
+    }
+  ]
+}

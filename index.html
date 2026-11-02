@@ -1,0 +1,1254 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Galeri Kita</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Galeri foto, momen, dan lagu berdua.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: layar kunci (jam live) -> hero + widget -> baris foto jalan otomatis -> galeri berfilter -> kartu momen -> pemutar musik -> ikon sosmed. Bilah kaca di atas, dock di bawah, panel menu dari samping. */
+:root{
+  --font:-apple-system,BlinkMacSystemFont,"SF Pro Display","Figtree",system-ui,"Segoe UI",sans-serif;
+  --bg:#1b1c1f; --bg-2:#222428; --surface:#2a2c31; --surface-2:#383b41;
+  --line:rgba(255,255,255,.09); --fg:#f3f3f5; --muted:#a2a6af;
+  --accent:#8bb6ff; --accent-ink:#0b1626;
+  --glass:rgba(40,42,47,.62); --scrim:rgba(8,9,11,.6); --lb:rgba(10,11,13,.94);
+  --shadow:0 24px 60px rgba(0,0,0,.45); --bad:#ff8a8a; --good:#72d9a0;
+  color-scheme:dark;
+}
+:root[data-theme="light"]:not([data-look="dark"]),:root[data-look="light"]{
+  --bg:#e8e9ec; --bg-2:#f1f2f4; --surface:#ffffff; --surface-2:#dcdee3;
+  --line:rgba(0,0,0,.09); --fg:#16171a; --muted:#5d626d;
+  --accent:#1f6feb; --accent-ink:#ffffff;
+  --glass:rgba(247,248,250,.7); --scrim:rgba(20,22,28,.35); --lb:rgba(236,237,240,.95);
+  --shadow:0 24px 60px rgba(30,35,50,.18); --bad:#c93434; --good:#17794a;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+html.locked{overflow:hidden}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:16px;line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--bg)}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:inherit}
+img{display:block}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:8px}
+.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wrap{width:100%;max-width:1180px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+section{padding-block:72px;scroll-margin-top:12px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1,h2,h3{margin:0;text-wrap:balance}
+h2{font-size:clamp(30px,5vw,48px);font-weight:700;letter-spacing:-.03em;line-height:1.08}
+.sh{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.sh p{margin:0;color:var(--muted);max-width:52ch}
+.glass{background:var(--glass);-webkit-backdrop-filter:blur(22px) saturate(1.6);backdrop-filter:blur(22px) saturate(1.6);border:1px solid var(--line)}
+
+/* reveal saat scroll, bisa masuk dan keluar lagi */
+.rv{transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1),filter .9s cubic-bezier(.2,.7,.2,1);transition-delay:var(--d,0ms)}
+.js .rv:not(.in){opacity:0;transform:translateY(30px) scale(.985);filter:blur(6px)}
+html[data-motion="off"] .rv{opacity:1!important;transform:none!important;filter:none!important;transition:none}
+
+/* layar kunci */
+.lock{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;color:#fff;background:#121316;overflow:hidden;
+  padding-top:calc(env(safe-area-inset-top,0px) + 9vh);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 40px);padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));
+  transition:transform 1s cubic-bezier(.7,0,.2,1),opacity 1s ease}
+.lock::before{content:"";position:absolute;inset:-6%;background:var(--bg-lock) center 30%/cover;filter:blur(22px) brightness(.42) saturate(1.1);z-index:-1}
+.lock.out{transform:translateY(-100%);opacity:0}
+.lock .lt{font-size:clamp(92px,27vw,210px);font-weight:200;letter-spacing:-.045em;line-height:.95;font-variant-numeric:tabular-nums}
+.lock .ld{font-size:clamp(17px,3vw,24px);font-weight:500;opacity:.9;margin-top:10px}
+.lock .lz{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.65;margin-top:8px}
+.lock .la{display:flex;flex-direction:column;align-items:center;gap:14px}
+.lock .hint{font-size:13px;opacity:.7}
+
+.btn{display:inline-flex;align-items:center;gap:10px;border:0;border-radius:999px;padding:14px 26px;font-weight:600;font-size:16px;background:var(--accent);color:var(--accent-ink);transition:transform .3s cubic-bezier(.2,.8,.2,1),filter .3s}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:var(--surface);color:var(--fg);border:1px solid var(--line)}
+.lock .btn{background:rgba(255,255,255,.92);color:#16171a}
+.lock .txt{background:none;border:0;color:#fff;opacity:.75;font-size:14px;padding:6px 10px;text-decoration:underline;text-underline-offset:4px}
+
+/* bilah atas */
+.bar{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 10px);z-index:50;display:flex;justify-content:space-between;gap:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));pointer-events:none}
+.pill{pointer-events:auto;display:flex;align-items:center;gap:6px;border-radius:999px;padding:6px 8px 6px 16px;min-height:46px}
+.brand{font-weight:700;letter-spacing:-.01em;padding-right:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw}
+.tnow{font-size:13px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;padding-right:6px}
+.ibtn{width:34px;height:34px;border-radius:50%;border:0;background:var(--surface-2);display:grid;place-items:center;transition:transform .25s}
+.ibtn:active{transform:scale(.9)}
+.eq{display:flex;gap:2px;align-items:flex-end;height:14px}
+.eq i{width:3px;height:5px;border-radius:2px;background:currentColor}
+.playing .eq i{animation:eq 1s ease-in-out infinite}
+.playing .eq i:nth-child(2){animation-delay:.2s}.playing .eq i:nth-child(3){animation-delay:.4s}
+@keyframes eq{0%,100%{height:4px}50%{height:14px}}
+@media(max-width:560px){.tnow .dt{display:none}}
+
+/* dock bawah */
+.dock{position:fixed;z-index:50;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 12px);display:flex;gap:2px;padding:6px;border-radius:26px;max-width:calc(100% - 32px)}
+.dock a{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:58px;padding:7px 8px 5px;border-radius:20px;text-decoration:none;color:var(--muted);font-size:10.5px;font-weight:600;transition:background .35s,color .35s}
+.dock a.on{background:var(--surface-2);color:var(--fg)}
+@media(max-width:380px){.dock a{min-width:52px}}
+
+/* hero */
+.hero{padding-top:112px;padding-bottom:40px}
+.hgrid{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center}
+.hgrid>*{min-width:0}
+.hero h1{font-size:clamp(46px,9vw,104px);font-weight:700;letter-spacing:-.04em;line-height:.98;margin-top:14px}
+.hero h1 span{color:var(--muted);font-weight:300}
+.hero .lead{font-size:clamp(17px,2.2vw,20px);color:var(--muted);max-width:42ch;margin:20px 0 28px}
+.acts{display:flex;flex-wrap:wrap;gap:12px}
+.widgets{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:36px}
+.widget{background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:18px 20px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.widget .wl{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.widget .big{font-size:clamp(34px,5vw,48px);font-weight:300;letter-spacing:-.035em;line-height:1.1;font-variant-numeric:tabular-nums;margin-top:6px}
+.widget .big small{font-size:.42em;font-weight:500;color:var(--muted);margin-left:4px;letter-spacing:0}
+.widget .ws{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.widget .ws b{color:var(--fg);font-weight:600}
+@media(max-width:480px){.widgets{grid-template-columns:1fr}}
+.stack{position:relative;height:540px}
+.stack .c{position:absolute;margin:0;border-radius:28px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);background:var(--surface);
+  transform:translateY(calc(var(--sy,0) * var(--k) * 1px)) rotate(var(--r))}
+.stack .c img{width:100%;height:100%;object-fit:cover}
+.c1{--r:-6deg;--k:-.05;left:0;top:70px;width:46%;aspect-ratio:3/4.4;z-index:1}
+.c2{--r:3deg;--k:-.1;right:2%;top:0;width:56%;aspect-ratio:2/3;z-index:3}
+.c3{--r:-2deg;--k:-.16;left:24%;bottom:0;width:40%;aspect-ratio:3/4;z-index:2}
+@media(max-width:860px){.hgrid{grid-template-columns:1fr}.stack{height:440px;max-width:520px;width:100%;margin-inline:auto}}
+
+/* foto jalan otomatis */
+.marq{padding-block:28px 12px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.mrow{display:flex;gap:14px;width:max-content;margin-bottom:14px;--mh:230px;animation:mq 70s linear infinite}
+.mrow.rev{animation-direction:reverse;animation-duration:82s}
+.mrow img{height:var(--mh);width:auto;border-radius:20px;flex:none;border:1px solid var(--line)}
+@keyframes mq{to{transform:translateX(calc(-50% - 7px))}}
+@media(max-width:600px){.mrow{--mh:160px}}
+html[data-motion="off"] .mrow{animation:none}
+
+/* galeri */
+.tools{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:22px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none;min-width:0;max-width:100%}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600;transition:background .3s,color .3s,transform .3s}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:transparent}
+.chip small{opacity:.6;margin-left:6px;font-weight:500}
+.cnt{color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+html{--n:3}
+html[data-size="s"]{--n:5}html[data-size="m"]{--n:3}html[data-size="l"]{--n:2}
+@media(max-width:900px){html[data-size="s"]{--n:4}html[data-size="m"]{--n:3}html[data-size="l"]{--n:2}}
+@media(max-width:600px){html[data-size="s"]{--n:3}html[data-size="m"]{--n:2}html[data-size="l"]{--n:1}}
+.grid{column-count:var(--n);column-gap:12px}
+html[data-layout="rapi"] .grid{column-count:auto;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:12px}
+.ph{position:relative;display:block;width:100%;padding:0;border:1px solid var(--line);background:var(--surface);border-radius:20px;overflow:hidden;margin:0 0 12px;break-inside:avoid;transition:transform .5s cubic-bezier(.2,.8,.2,1),box-shadow .5s,opacity .9s,filter .9s}
+html[data-layout="rapi"] .ph{margin:0;aspect-ratio:4/5}
+.ph img{width:100%;height:auto;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+html[data-layout="rapi"] .ph img{height:100%;object-fit:cover}
+.ph:hover{box-shadow:var(--shadow)}
+.ph:hover img{transform:scale(1.045)}
+.ph .tag{position:absolute;left:10px;bottom:10px;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:600;background:rgba(15,16,18,.55);color:#fff;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);opacity:0;transform:translateY(6px);transition:.4s}
+.ph:hover .tag,.ph:focus-visible .tag{opacity:1;transform:none}
+@media(hover:none){.ph .tag{opacity:1;transform:none}}
+.empty{padding:40px 0;color:var(--muted)}
+
+/* momen */
+.cards{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px max(16px,env(safe-area-inset-left,0px)) 24px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cards::-webkit-scrollbar{display:none}
+.mc{position:relative;flex:none;width:min(78vw,320px);aspect-ratio:3/4.1;scroll-snap-align:center;border:1px solid var(--line);border-radius:30px;overflow:hidden;padding:0;background:var(--surface);text-align:left;color:#fff;box-shadow:var(--shadow);transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.mc:hover{transform:translateY(-6px)}
+.mc img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mc::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.25),transparent 35%,rgba(0,0,0,.78))}
+.mc .mt{position:absolute;left:20px;right:20px;bottom:20px;z-index:2;display:flex;flex-direction:column;gap:6px}
+.mc small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;opacity:.8}
+.mc h3{font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.mc p{margin:0;font-size:14px;opacity:.88;line-height:1.45}
+.mc .top{position:absolute;left:20px;top:18px;z-index:2}
+
+/* musik */
+.player{display:grid;grid-template-columns:minmax(0,280px) minmax(0,1fr);gap:32px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:36px;padding:24px}
+.player .cover{border-radius:26px;overflow:hidden;aspect-ratio:1;box-shadow:var(--shadow)}
+.player .cover img{width:100%;height:100%;object-fit:cover}
+.player .pt{font-size:clamp(26px,4vw,38px);font-weight:700;letter-spacing:-.03em;line-height:1.1}
+.player .pa{color:var(--muted);margin:6px 0 22px}
+.seek{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pc{display:flex;align-items:center;gap:14px;margin-top:20px;flex-wrap:wrap}
+.big-play{width:68px;height:68px;border-radius:50%;border:0;background:var(--fg);color:var(--bg);display:grid;place-items:center;transition:transform .3s}
+.big-play:active{transform:scale(.93)}
+.big-play .i{width:28px;height:28px}
+.tog{border:1px solid var(--line);background:var(--bg-2);border-radius:999px;padding:10px 16px;font-size:14px;font-weight:600;display:inline-flex;gap:8px;align-items:center;color:var(--muted)}
+.tog[aria-pressed="true"]{color:var(--accent);border-color:var(--accent)}
+.vol{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px}
+.vol input{width:110px}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;height:28px;flex:1;min-width:0;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:5px;border-radius:5px;background:linear-gradient(90deg,var(--fg) var(--v,0%),var(--surface-2) var(--v,0%))}
+input[type=range]::-moz-range-track{height:5px;border-radius:5px;background:var(--surface-2)}
+input[type=range]::-moz-range-progress{height:5px;border-radius:5px;background:var(--fg)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--fg);margin-top:-6.5px;border:0}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--fg);border:0}
+@media(max-width:700px){.player{grid-template-columns:1fr;padding:18px;gap:22px}.player .cover{max-width:300px;width:100%;margin-inline:auto}}
+
+/* sosmed */
+.homescreen{position:relative;overflow:hidden;border-radius:40px;border:1px solid var(--line);padding:44px 24px 36px;background:var(--bg-2)}
+.homescreen::before{content:"";position:absolute;inset:-10%;background:var(--bg-home) center/cover;filter:blur(40px) brightness(.5) saturate(1.2);opacity:.55}
+html[data-look="light"] .homescreen::before,:root[data-theme="light"]:not([data-look="dark"]) .homescreen::before{filter:blur(40px) brightness(1.1) saturate(1.1);opacity:.35}
+.apps{position:relative;display:flex;flex-wrap:wrap;justify-content:center;gap:34px 44px}
+.app{display:flex;flex-direction:column;align-items:center;gap:10px;text-decoration:none;font-size:13px;font-weight:600;transition:transform .35s cubic-bezier(.3,1.6,.5,1)}
+.app:hover{transform:translateY(-6px) scale(1.05)}
+.app:active{transform:scale(.92)}
+.tile{width:92px;height:92px;border-radius:22.4%;display:grid;place-items:center;color:#fff;box-shadow:0 14px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.25)}
+.tile .i{width:44px;height:44px;stroke-width:1.7}
+.t-foto{background:linear-gradient(145deg,#8e5cf0,#e0508f 60%,#f08a4b)}
+.t-video{background:linear-gradient(145deg,#1e2b33,#0f161b)}
+.t-chat{background:linear-gradient(145deg,#38d27a,#17a05a)}
+.note{position:relative;text-align:center;color:var(--muted);font-size:14px;margin:26px 0 0}
+footer{padding-block:20px 140px;color:var(--muted);font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+/* panel menu */
+.scrim{position:fixed;inset:0;z-index:70;background:var(--scrim);opacity:0;pointer-events:none;transition:opacity .45s}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;z-index:80;right:0;top:0;bottom:0;width:min(420px,100%);background:var(--bg-2);border-left:1px solid var(--line);overflow-y:auto;overscroll-behavior:contain;transform:translateX(105%);transition:transform .55s cubic-bezier(.2,.8,.2,1);
+  padding-top:calc(env(safe-area-inset-top,0px) + 18px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 28px);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.sheet.open{transform:none}
+@media(max-width:700px){.sheet{top:auto;left:0;width:100%;max-height:88%;border-left:0;border-top:1px solid var(--line);border-radius:30px 30px 0 0;transform:translateY(105%)}}
+.sheet h2{font-size:26px;letter-spacing:-.02em}
+.shead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.gl{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:22px 4px 8px}
+.grp{background:var(--surface);border-radius:20px;overflow:hidden;border:1px solid var(--line)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 14px;border-top:1px solid var(--line);min-height:54px}
+.row:first-child{border-top:0}
+.row>span{font-weight:500}
+.seg{display:flex;background:var(--bg);border-radius:11px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;color:var(--muted);padding:6px 12px;border-radius:9px;font-size:14px;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--fg)}
+.fld{width:100%;display:flex;flex-direction:column;gap:6px}
+.fld label{font-size:13px;color:var(--muted)}
+.fld input[type=text],.fld input[type=date],.fld input[type=password]{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:12px;padding:11px 12px;font:inherit;min-width:0}
+.mini{border:1px solid var(--line);background:var(--surface-2);border-radius:12px;padding:9px 14px;font-weight:600;font-size:14px}
+.help{font-size:13px;color:var(--muted);margin:8px 4px 0}
+
+/* penampil foto */
+.lb{position:fixed;inset:0;z-index:90;background:var(--lb);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .4s;
+  padding-top:calc(env(safe-area-inset-top,0px) + 64px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 76px);padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px));
+  -webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px)}
+.lb.open{opacity:1}
+.lbtop{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 10px);display:flex;justify-content:space-between;align-items:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.lbtop .cnt{font-weight:600;color:var(--fg)}
+.lbact{display:flex;gap:8px}
+.lbact .ibtn{width:42px;height:42px;background:var(--surface)}
+.stage{width:100%;height:100%;display:grid;place-items:center;touch-action:pan-y;min-height:0}
+.stage img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:18px;box-shadow:var(--shadow);transition:opacity .35s,transform .5s cubic-bezier(.2,.8,.2,1)}
+.stage img.sw{opacity:0;transform:scale(.97)}
+.lbnav{position:absolute;top:50%;margin-top:-24px;width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;z-index:2}
+.lbnav.prev{left:max(12px,env(safe-area-inset-left,0px))}.lbnav.next{right:max(12px,env(safe-area-inset-right,0px))}
+@media(max-width:600px){.lbnav{top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);margin:0}.lbnav.prev{left:16px}.lbnav.next{right:16px}}
+.lbcap{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);text-align:center;display:flex;flex-direction:column;gap:2px;pointer-events:none;padding-inline:76px}
+.lbcap b{font-weight:700}.lbcap span{font-size:13px;color:var(--muted)}
+
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.mrow{animation:none}.rv{transition:none}.js .rv:not(.in){opacity:1;transform:none;filter:none}}
+
+[hidden]{display:none!important}
+.btn:disabled,.mini:disabled{opacity:.55;pointer-events:none}
+footer .txt{background:none;border:0;color:var(--muted);font-size:14px;padding:0;text-decoration:underline;text-underline-offset:4px}
+.lbedit{position:absolute;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top,0px) + 62px);width:min(580px,calc(100% - 32px));display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px;border-radius:18px;z-index:3}
+.lbedit input{flex:1 1 150px;min-width:0;border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:10px;padding:9px 10px;font:inherit;font-size:14px}
+.lbedit .mini.danger{color:var(--bad)}
+.lbnote{flex-basis:100%;font-size:12px;color:var(--muted);min-height:1.2em}
+.lb.adm{padding-top:calc(env(safe-area-inset-top,0px) + 150px)}
+.chk{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
+.amsg{font-size:13px;color:var(--muted);margin:12px 4px 0;min-height:1.4em}
+.amsg.err{color:var(--bad)}.amsg.ok{color:var(--good)}
+.eq i{height:9px!important}.playing .eq i{height:auto!important}.eq{height:16px}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%}
+</style>
+<script>document.documentElement.className+=' js'</script>
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.500V19a1 1 0 0 1-1 1h-4v-5h-6v5H5a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.400-7-10a4 4 0 0 1 7-2.400A4 4 0 0 1 19 10c0 5.600-7 10-7 10z"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><path d="M9 18V6l10-2v12"/><circle cx="6.500" cy="18" r="2.500"/><circle cx="16.500" cy="16" r="2.500"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-7l-4.500 3.500V16H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M8.500 10.500h.01M12 10.500h.01M15.500 10.500h.01" stroke-width="2.400"/></symbol>
+  <symbol id="i-photo" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="3.500"/><path d="m4.500 16 4-4 3.500 3.500 2.500-2.500 5 4.500"/><circle cx="9" cy="9.500" r="1.300"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.700" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.700" fill="currentColor" stroke="none"/><circle cx="18" cy="12" r="1.700" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.500v13l10.500-6.500z" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6.500" y="5" width="4" height="14" rx="1.200" fill="currentColor" stroke="none"/><rect x="13.500" y="5" width="4" height="14" rx="1.200" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><path d="m14.500 6-6 6 6 6"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="m9.500 6 6 6-6 6"/></symbol>
+  <symbol id="i-loop" viewBox="0 0 24 24"><path d="M4 11V9a3 3 0 0 1 3-3h11l-2.500-2.500M20 13v2a3 3 0 0 1-3 3H6l2.500 2.500"/></symbol>
+  <symbol id="i-vol" viewBox="0 0 24 24"><path d="M4 10v4h3.500L12 18V6L7.500 10zM16 9.500a4 4 0 0 1 0 5"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></symbol>
+</svg>
+
+<div class="lock" id="lock" role="dialog" aria-label="Layar pembuka">
+  <div>
+    <div class="lt" id="lkT">00:00</div>
+    <div class="ld" id="lkD">&nbsp;</div>
+    <div class="lz">WIB &middot; Jakarta</div>
+  </div>
+  <div class="la">
+    <button class="btn" id="enter" type="button"><svg class="i"><use href="#i-play"/></svg>Memuat...</button>
+    <button class="txt" id="enterQuiet" type="button">Masuk tanpa musik</button>
+    <div class="hint">Galeri kenangan kita</div>
+  </div>
+</div>
+
+<header class="bar">
+  <div class="pill glass"><span class="brand" id="brand">Galeri Kita</span></div>
+  <div class="pill glass" id="rightPill">
+    <span class="tnow"><span class="dt" id="tDate"></span> <span id="tNow"></span></span>
+    <button class="ibtn" id="bMusic" type="button" aria-label="Putar atau jeda musik"><span class="eq"><i></i><i></i><i></i></span></button>
+    <button class="ibtn" id="bMenu" type="button" aria-label="Buka menu pengaturan"><svg class="i"><use href="#i-dots"/></svg></button>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="beranda">
+    <div class="wrap hgrid">
+      <div>
+        <div class="eyebrow rv">Galeri kenangan berdua</div>
+        <h1 class="rv" style="--d:80ms" id="hName"></h1>
+        <p class="lead rv" style="--d:160ms">Foto, cerita, dan lagu kita, dikumpulkan di satu tempat supaya gampang dibuka kapan saja.</p>
+        <div class="acts rv" style="--d:240ms">
+          <button class="btn" type="button" data-go="galeri"><svg class="i"><use href="#i-grid"/></svg>Lihat galeri</button>
+          <button class="btn ghost" type="button" data-go="musik"><svg class="i"><use href="#i-note"/></svg>Putar musik</button>
+        </div>
+        <div class="widgets">
+          <div class="widget rv" style="--d:300ms">
+            <span class="wl">Sekarang</span>
+            <span class="big"><span id="wT">00:00</span><small id="wS">00</small></span>
+            <span class="ws"><b id="wDay">&nbsp;</b></span>
+            <span class="ws" id="wDate">&nbsp;</span>
+          </div>
+          <div class="widget rv" style="--d:380ms">
+            <span class="wl">Bersama</span>
+            <span class="big"><span id="cD">0</span><small>hari</small></span>
+            <span class="ws" id="cSub">&nbsp;</span>
+            <span class="ws" id="cHms">&nbsp;</span>
+          </div>
+        </div>
+      </div>
+      <div class="stack rv" style="--d:200ms" id="stack" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <div class="marq" id="marq" aria-hidden="true"></div>
+
+  <section id="galeri">
+    <div class="wrap">
+      <div class="sh rv"><span class="eyebrow">Galeri</span><h2>Semua foto kita</h2><p>Pilih album di bawah, lalu ketuk foto untuk membukanya layar penuh.</p></div>
+      <div class="tools rv">
+        <div class="chips" id="chips" role="group" aria-label="Pilih album"></div>
+        <span class="cnt" id="cnt"></span>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section id="momen">
+    <div class="wrap"><div class="sh rv"><span class="eyebrow">Momen</span><h2>Cerita di balik foto</h2><p>Geser ke samping, ketuk kartu untuk melihat fotonya.</p></div></div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section id="musik">
+    <div class="wrap">
+      <div class="sh rv"><span class="eyebrow">Musik</span><h2>Lagu kita</h2></div>
+      <div class="player rv">
+        <div class="cover"><img id="cover" width="1000" height="1500" alt="Sampul lagu"></div>
+        <div>
+          <div class="pt" id="trT">Lagu Kita</div>
+          <div class="pa" id="trA">Teman scroll di galeri ini</div>
+          <div class="seek"><span id="pCur">0:00</span><input type="range" id="pSeek" min="0" max="1000" value="0" aria-label="Posisi lagu"><span id="pDur">0:00</span></div>
+          <div class="pc">
+            <button class="big-play" id="pPlay" type="button" aria-label="Putar atau jeda"><svg class="i"><use href="#i-play"/></svg></button>
+            <button class="tog" id="pLoop" type="button" aria-pressed="true"><svg class="i"><use href="#i-loop"/></svg>Ulangi</button>
+            <label class="vol"><svg class="i"><use href="#i-vol"/></svg><input type="range" id="pVol" min="0" max="100" value="70" aria-label="Volume"></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="sosmed">
+    <div class="wrap">
+      <div class="sh rv"><span class="eyebrow">Sosial media</span><h2>Temukan kami</h2></div>
+      <div class="homescreen rv">
+        <div class="apps" id="apps"></div>
+        <p class="note">Ketuk ikon untuk membuka akunnya.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap"><span id="foot"></span><span>Dibuat untuk kenangan kita &middot; <button class="txt" id="adminLink" type="button">Admin</button></span></div></footer>
+
+<nav class="dock glass" id="dock" aria-label="Navigasi bagian">
+  <a href="#beranda" data-s="beranda"><svg class="i"><use href="#i-home"/></svg>Beranda</a>
+  <a href="#galeri" data-s="galeri"><svg class="i"><use href="#i-grid"/></svg>Galeri</a>
+  <a href="#momen" data-s="momen"><svg class="i"><use href="#i-heart"/></svg>Momen</a>
+  <a href="#musik" data-s="musik"><svg class="i"><use href="#i-note"/></svg>Musik</a>
+  <a href="#sosmed" data-s="sosmed"><svg class="i"><use href="#i-chat"/></svg>Sosmed</a>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+<aside class="sheet" id="sheet" aria-label="Pengaturan" aria-hidden="true"></aside>
+<aside class="sheet" id="asheet" aria-label="Admin" aria-hidden="true"></aside>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Penampil foto">
+  <div class="lbtop">
+    <span class="cnt" id="lbCount"></span>
+    <div class="lbact">
+      <button class="ibtn" id="lbPlay" type="button" aria-label="Putar slideshow"><svg class="i"><use href="#i-play"/></svg></button>
+      <button class="ibtn" id="lbX" type="button" aria-label="Tutup"><svg class="i"><use href="#i-x"/></svg></button>
+    </div>
+  </div>
+  <button class="lbnav prev" id="lbPrev" type="button" aria-label="Foto sebelumnya"><svg class="i"><use href="#i-prev"/></svg></button>
+  <div class="stage" id="stage"><img id="lbImg" alt=""></div>
+  <button class="lbnav next" id="lbNext" type="button" aria-label="Foto berikutnya"><svg class="i"><use href="#i-next"/></svg></button>
+  <div class="lbcap"><b id="lbT"></b><span id="lbTg"></span></div>
+  <div class="lbedit glass" id="lbEdit" hidden><input type="text" id="lbTitle" maxlength="60" aria-label="Judul foto" placeholder="Judul foto"><input type="text" id="lbTags" aria-label="Album foto" placeholder="Album, pisahkan koma"><button class="mini" id="lbSave" type="button">Simpan</button><button class="mini danger" id="lbDelete" type="button">Hapus</button><span class="lbnote" id="lbNote" role="status"></span></div>
+</div>
+
+<audio id="au" preload="auto" loop></audio>
+<input type="file" id="fileIn" accept="image/*" multiple hidden>
+<input type="file" id="audIn" accept="audio/*" hidden>
+
+<script type="application/json" id="cfg0">{
+  "names": [
+    "Shiren",
+    "Dia"
+  ],
+  "since": "2025-01-01",
+  "track": {
+    "title": "Lagu Kita",
+    "artist": "Teman scroll di galeri ini",
+    "file": "audio/lagu.mp3"
+  },
+  "sosmed": [
+    {
+      "key": "instagram",
+      "label": "Instagram",
+      "url": "https://www.instagram.com/"
+    },
+    {
+      "key": "tiktok",
+      "label": "TikTok",
+      "url": "https://www.tiktok.com/"
+    },
+    {
+      "key": "whatsapp",
+      "label": "WhatsApp",
+      "url": "https://wa.me/"
+    }
+  ],
+  "albums": [
+    "Berdua",
+    "Bandung",
+    "Photobooth",
+    "Potret",
+    "Cermin",
+    "Jalan-jalan"
+  ],
+  "hero": [
+    "photos/08.jpg",
+    "photos/09.jpg",
+    "photos/04.jpg"
+  ],
+  "cover": "photos/09.jpg",
+  "moments": [
+    {
+      "file": "photos/04.jpg",
+      "k": "Photobooth",
+      "title": "Empat jepretan",
+      "text": "Dua strip foto dan kenangan yang bisa dipegang."
+    },
+    {
+      "file": "photos/08.jpg",
+      "k": "Asia Afrika",
+      "title": "Di bawah bola dunia",
+      "text": "Dunia luas, tapi berdua rasanya cukup."
+    },
+    {
+      "file": "photos/07.jpg",
+      "k": "Bandung",
+      "title": "Dinding berkata",
+      "text": "Kita berdiri diam dan membaca kalimat di dinding."
+    },
+    {
+      "file": "photos/11.jpg",
+      "k": "Malam",
+      "title": "Lampu neon",
+      "text": "Jalan ramai, warna biru dan oranye di mana-mana."
+    },
+    {
+      "file": "photos/03.jpg",
+      "k": "Selfie",
+      "title": "Tanpa rencana",
+      "text": "Satu foto cepat yang jadi favorit."
+    },
+    {
+      "file": "photos/12.jpg",
+      "k": "Santai",
+      "title": "Es kopi dan senyum",
+      "text": "Hal kecil yang bikin hari terasa ringan."
+    }
+  ],
+  "photos": [
+    {
+      "file": "photos/01.jpg",
+      "w": 748,
+      "h": 1024,
+      "title": "Gaya santai",
+      "alt": "Potret santai memakai kacamata hitam di dalam toko",
+      "tags": [
+        "Potret"
+      ]
+    },
+    {
+      "file": "photos/02.jpg",
+      "w": 1440,
+      "h": 1080,
+      "title": "Selfie malam",
+      "alt": "Selfie berdua di malam hari",
+      "tags": [
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/03.jpg",
+      "w": 1440,
+      "h": 1080,
+      "title": "Selfie malam 2",
+      "alt": "Selfie berdua dengan latar tanaman",
+      "tags": [
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/04.jpg",
+      "w": 844,
+      "h": 1500,
+      "title": "Photobooth",
+      "alt": "Dua strip foto photobooth",
+      "tags": [
+        "Photobooth",
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/05.jpg",
+      "w": 844,
+      "h": 1500,
+      "title": "Cermin lengkung",
+      "alt": "Berdua terpantul di cermin lengkung merah",
+      "tags": [
+        "Photobooth",
+        "Cermin",
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/06.jpg",
+      "w": 844,
+      "h": 1500,
+      "title": "Menyeberang",
+      "alt": "Suasana jalan di depan dinding berisi kutipan",
+      "tags": [
+        "Bandung"
+      ]
+    },
+    {
+      "file": "photos/07.jpg",
+      "w": 1500,
+      "h": 1000,
+      "title": "Depan dinding kata",
+      "alt": "Berdua dari belakang menghadap dinding kutipan",
+      "tags": [
+        "Bandung",
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/08.jpg",
+      "w": 1000,
+      "h": 1500,
+      "title": "Asia Afrika",
+      "alt": "Berdua saling menatap di dekat bola dunia",
+      "tags": [
+        "Bandung",
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/09.jpg",
+      "w": 1000,
+      "h": 1500,
+      "title": "Berdiri berdua",
+      "alt": "Berdua berpose di dekat bola dunia",
+      "tags": [
+        "Bandung",
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/10.jpg",
+      "w": 1000,
+      "h": 1500,
+      "title": "Pose santai",
+      "alt": "Berdua menoleh ke samping dengan jalan ramai di belakang",
+      "tags": [
+        "Bandung",
+        "Berdua"
+      ]
+    },
+    {
+      "file": "photos/11.jpg",
+      "w": 844,
+      "h": 1500,
+      "title": "Neon malam",
+      "alt": "Bangunan berlampu neon biru dan oranye di malam hari",
+      "tags": [
+        "Bandung",
+        "Potret"
+      ]
+    },
+    {
+      "file": "photos/12.jpg",
+      "w": 844,
+      "h": 1500,
+      "title": "Es kopi",
+      "alt": "Tersenyum sambil memegang es kopi",
+      "tags": [
+        "Potret"
+      ]
+    },
+    {
+      "file": "photos/13.jpg",
+      "w": 1230,
+      "h": 692,
+      "title": "Di atas jembatan",
+      "alt": "Foto miring di jembatan dekat danau",
+      "tags": [
+        "Jalan-jalan"
+      ]
+    },
+    {
+      "file": "photos/14.jpg",
+      "w": 720,
+      "h": 1280,
+      "title": "Selfie cermin",
+      "alt": "Selfie di depan cermin besar",
+      "tags": [
+        "Cermin",
+        "Potret"
+      ]
+    },
+    {
+      "file": "photos/15.jpg",
+      "w": 720,
+      "h": 1280,
+      "title": "Dari balik cermin",
+      "alt": "Berdua terlihat di cermin dengan lampu malam",
+      "tags": [
+        "Cermin",
+        "Berdua"
+      ]
+    }
+  ]
+}
+</script>
+<script>
+(function(){
+'use strict';
+
+var R = document.documentElement;
+function $(id){ return document.getElementById(id); }
+var PREVIEW = (window.ASSETS && typeof window.ASSETS === 'object') ? window.ASSETS : null;   /* mode pratinjau di Claude */
+function asset(p){ return (PREVIEW && PREVIEW[p]) ? PREVIEW[p] : p; }
+var RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+var KEY = 'galeri-kita-v2', AKEY = 'galeri-admin';
+var DEF = { look:'dark', motion: RM ? 'off' : 'on', h24:true, size:'m', layout:'masonry', order:'asli', loop:true, vol:70 };
+var S = Object.assign({}, DEF);
+try { var raw = localStorage.getItem(KEY); if (raw) Object.assign(S, JSON.parse(raw)); } catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+function pad(n){ return (n < 10 ? '0' : '') + n; }
+function safeUrl(u){ return /^https:\/\//i.test(u || '') ? u : '#'; }
+
+var CFG = null, P = [], album = 'Semua', cur = [];
+var au = $('au');
+var APPMAP = { instagram:{cls:'t-foto',icon:'i-photo'}, tiktok:{cls:'t-video',icon:'i-note'}, whatsapp:{cls:'t-chat',icon:'i-chat'} };
+
+/* ---------- konfigurasi (config.json) ---------- */
+function normalize(c){
+  c = (c && typeof c === 'object') ? c : {};
+  c.names = (Array.isArray(c.names) && c.names.length >= 2) ? c.names : ['Kita', 'Berdua'];
+  c.since = c.since || '';
+  c.track = Object.assign({ title:'Lagu Kita', artist:'', file:'audio/lagu.mp3' }, c.track || {});
+  c.sosmed = Array.isArray(c.sosmed) ? c.sosmed : [];
+  c.albums = Array.isArray(c.albums) ? c.albums : [];
+  c.hero = Array.isArray(c.hero) ? c.hero : [];
+  c.moments = Array.isArray(c.moments) ? c.moments : [];
+  c.photos = (Array.isArray(c.photos) ? c.photos : []).filter(function(p){ return p && p.file; });
+  c.photos.forEach(function(p){ p.tags = Array.isArray(p.tags) ? p.tags : []; p.title = p.title || 'Foto'; p.alt = p.alt || p.title; p.w = p.w || 1000; p.h = p.h || 1000; });
+  return c;
+}
+function loadCfg(){
+  function fallback(){ try { return JSON.parse($('cfg0').textContent); } catch(e){ return null; } }
+  if (PREVIEW) return Promise.resolve(fallback());
+  var ctl = ('AbortController' in window) ? new AbortController() : null;
+  var to = setTimeout(function(){ if (ctl) ctl.abort(); }, 6000);
+  return fetch('config.json?v=' + Date.now(), { cache:'no-store', signal: ctl ? ctl.signal : undefined })
+    .then(function(r){ if (!r.ok) throw new Error('x'); return r.json(); })
+    .then(function(j){ clearTimeout(to); return j; })
+    .catch(function(){ clearTimeout(to); return fallback(); });
+}
+function cfgOut(){
+  return { names:CFG.names, since:CFG.since, track:CFG.track, sosmed:CFG.sosmed, albums:CFG.albums, hero:CFG.hero, cover:CFG.cover, moments:CFG.moments,
+    photos: CFG.photos.map(function(p){ return { file:p.file, w:p.w, h:p.h, title:p.title, alt:p.alt, tags:p.tags }; }) };
+}
+function buildP(){
+  P = CFG.photos.map(function(p, i){ return { id:p.file, file:p.file, src:p.local || asset(p.file), w:p.w, h:p.h, t:p.tags, title:p.title, a:p.alt, r:i }; });
+}
+function byFile(f){ for (var i = 0; i < P.length; i++) if (P[i].file === f) return P[i]; return null; }
+function heroPaths(){
+  var out = (CFG.hero || []).filter(function(f){ return byFile(f); });
+  for (var i = 0; i < P.length && out.length < 3; i++) if (out.indexOf(P[i].file) < 0) out.push(P[i].file);
+  return out.slice(0, 3);
+}
+function allAlbums(){
+  var a = (CFG.albums || []).slice();
+  P.forEach(function(p){ p.t.forEach(function(t){ if (a.indexOf(t) < 0) a.push(t); }); });
+  return ['Semua'].concat(a);
+}
+function names(){ return [CFG.names[0] || '', CFG.names[1] || '']; }
+
+/* ---------- jam dan tanggal (WIB) ---------- */
+var TZ = 'Asia/Jakarta';
+var fFull = new Intl.DateTimeFormat('id-ID', { timeZone:TZ, hourCycle:'h23', weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+var fShort = new Intl.DateTimeFormat('id-ID', { timeZone:TZ, weekday:'short', day:'numeric', month:'short' });
+var fNum = new Intl.DateTimeFormat('en-US', { timeZone:TZ, year:'numeric', month:'numeric', day:'numeric' });
+function parts(f, d){ var o = {}; f.formatToParts(d).forEach(function(p){ o[p.type] = p.value; }); return o; }
+function clock(d){
+  var o = parts(fFull, d), h = +o.hour, ap = '';
+  if (!S.h24){ ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; }
+  var s = parts(fShort, d);
+  return { hm:(S.h24 ? pad(h) : String(h)) + ':' + o.minute, s:o.second, ap:ap, day:o.weekday, date:o.day + ' ' + o.month + ' ' + o.year,
+           full:o.weekday + ', ' + o.day + ' ' + o.month + ' ' + o.year, short:s.weekday + ', ' + s.day + ' ' + s.month };
+}
+function together(now){
+  var since = CFG ? CFG.since : '';
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(since || '');
+  if (!m) return null;
+  var st = new Date(since + 'T00:00:00+07:00'); if (isNaN(st)) return null;
+  var diff = now - st; if (diff < 0) diff = 0;
+  var days = Math.floor(diff / 864e5), r = diff - days * 864e5;
+  var h = Math.floor(r / 36e5), mi = Math.floor(r % 36e5 / 6e4), se = Math.floor(r % 6e4 / 1e3);
+  var n = parts(fNum, now), ny = +n.year, nm = +n.month, nd = +n.day;
+  var y = ny - (+m[1]), mo = nm - (+m[2]), d = nd - (+m[3]);
+  if (d < 0){ mo--; d += new Date(Date.UTC(ny, nm - 1, 0)).getUTCDate(); }
+  if (mo < 0){ y--; mo += 12; }
+  var bits = []; if (y > 0) bits.push(y + ' tahun'); if (mo > 0) bits.push(mo + ' bulan'); if (d > 0 || !bits.length) bits.push(d + ' hari');
+  return { days:days, sub:bits.join(' '), hms:pad(h) + ' jam ' + pad(mi) + ' menit ' + pad(se) + ' detik' };
+}
+function tick(){
+  var now = new Date(), c = clock(now);
+  $('lkT').textContent = c.hm; $('lkD').textContent = c.full;
+  $('wT').textContent = c.hm; $('wS').textContent = c.ap ? (c.s + ' ' + c.ap) : c.s;
+  $('wDay').textContent = c.day; $('wDate').textContent = c.date;
+  $('tNow').textContent = c.hm + (c.ap ? ' ' + c.ap : ''); $('tDate').textContent = c.short + ' ·';
+  var t = together(now);
+  if (t){ $('cD').textContent = t.days.toLocaleString('id-ID'); $('cSub').textContent = t.sub; $('cHms').textContent = '+ ' + t.hms; }
+  else { $('cD').textContent = '0'; $('cSub').textContent = 'Tanggal jadian belum diatur'; $('cHms').textContent = ''; }
+}
+
+/* ---------- tampilan ---------- */
+function applyLook(){
+  R.dataset.look = S.look; R.dataset.motion = S.motion; R.dataset.size = S.size; R.dataset.layout = S.layout;
+  au.loop = !!S.loop; au.volume = Math.max(0, Math.min(1, S.vol / 100));
+  if (S.motion === 'off') R.style.setProperty('--sy', '0');
+  if (!CFG) return;
+  var n = names(), both = n[0] + (n[1] ? ' & ' + n[1] : '');
+  $('brand').textContent = both || 'Galeri Kita';
+  $('hName').innerHTML = esc(n[0]) + (n[1] ? '<br><span>&amp;</span> ' + esc(n[1]) : '');
+  $('foot').textContent = '© ' + new Date().getFullYear() + ' ' + both;
+  $('trT').textContent = CFG.track.title || 'Lagu Kita'; $('trA').textContent = CFG.track.artist || '';
+}
+
+/* ---------- reveal saat scroll ---------- */
+var io = new IntersectionObserver(function(es){
+  if (R.classList.contains('locked')) return;
+  es.forEach(function(e){ e.target.classList.toggle('in', e.isIntersecting); });
+}, { threshold:.1, rootMargin:'0px 0px -4% 0px' });
+function watch(root){ (root || document).querySelectorAll('.rv').forEach(function(el){ io.observe(el); }); }
+
+/* ---------- render bagian halaman ---------- */
+function renderHero(){
+  $('stack').innerHTML = heroPaths().map(function(f, i){
+    var p = byFile(f); return '<figure class="c c' + (i + 1) + '"><img src="' + esc(p.src) + '" width="' + p.w + '" height="' + p.h + '" alt="" decoding="async"></figure>';
+  }).join('');
+  var hp = heroPaths(), lock = byFile(CFG.cover) || byFile(hp[1]) || P[0], home = byFile(hp[0]) || P[0];
+  R.style.setProperty('--bg-lock', lock ? 'url("' + lock.src + '")' : 'none');
+  R.style.setProperty('--bg-home', home ? 'url("' + home.src + '")' : 'none');
+  var cv = $('cover'), cp = lock;
+  if (cp){ cv.src = cp.src; cv.width = cp.w; cv.height = cp.h; cv.parentNode.style.display = ''; } else cv.parentNode.style.display = 'none';
+}
+function renderMarquee(){
+  if (!P.length){ $('marq').innerHTML = ''; return; }
+  function row(list, cls){
+    var one = list.map(function(p){ return '<img src="' + esc(p.src) + '" width="' + p.w + '" height="' + p.h + '" alt="" decoding="async">'; }).join('');
+    return '<div class="mrow ' + cls + '">' + one + one + '</div>';
+  }
+  var a = P.slice(), k = Math.min(5, P.length), b = P.slice(k).concat(P.slice(0, k)).reverse();
+  $('marq').innerHTML = row(a, '') + row(b, 'rev');
+}
+function renderMomen(){
+  var items = CFG.moments.filter(function(m){ return byFile(m.file); });
+  $('momen').style.display = items.length ? '' : 'none';
+  $('cards').innerHTML = items.map(function(m){
+    var p = byFile(m.file);
+    return '<button class="mc rv" type="button" data-id="' + esc(p.id) + '" aria-label="Buka foto ' + esc(m.title) + '"><img src="' + esc(p.src) + '" width="' + p.w + '" height="' + p.h + '" alt="" loading="lazy" decoding="async"><span class="mt"><small>' + esc(m.k) + '</small><h3>' + esc(m.title) + '</h3><p>' + esc(m.text) + '</p></span></button>';
+  }).join('');
+  watch($('cards'));
+}
+function renderApps(){
+  var items = CFG.sosmed.filter(function(s){ return s.url; });
+  $('apps').innerHTML = items.map(function(s){
+    var m = APPMAP[s.key] || { cls:'t-video', icon:'i-chat' };
+    return '<a class="app" href="' + esc(safeUrl(s.url)) + '" target="_blank" rel="noopener noreferrer"><span class="tile ' + m.cls + '"><svg class="i"><use href="#' + m.icon + '"/></svg></span>' + esc(s.label || s.key) + '</a>';
+  }).join('');
+}
+function inAlbum(p, a){ return a === 'Semua' || p.t.indexOf(a) > -1; }
+function list(){
+  var L = P.filter(function(p){ return inAlbum(p, album); });
+  if (S.order === 'acak') L.sort(function(a, b){ return a.r - b.r; });
+  return L;
+}
+function renderChips(){
+  var A = allAlbums(); if (A.indexOf(album) < 0) album = 'Semua';
+  $('chips').innerHTML = A.map(function(a){
+    var n = P.filter(function(p){ return inAlbum(p, a); }).length;
+    return '<button class="chip" type="button" data-a="' + esc(a) + '" aria-pressed="' + (a === album) + '">' + esc(a) + '<small>' + n + '</small></button>';
+  }).join('');
+}
+function renderGrid(){
+  cur = list();
+  $('cnt').textContent = cur.length + ' foto';
+  if (!cur.length){ $('grid').innerHTML = '<p class="empty">Belum ada foto di album ini.</p>'; return; }
+  $('grid').innerHTML = cur.map(function(p, i){
+    return '<button class="ph rv" type="button" style="--d:' + ((i % 8) * 55) + 'ms" data-id="' + esc(p.id) + '" aria-label="Buka foto: ' + esc(p.title) + '"><img src="' + esc(p.src) + '" width="' + p.w + '" height="' + p.h + '" alt="' + esc(p.a) + '" loading="lazy" decoding="async"><span class="tag">' + esc(p.title) + '</span></button>';
+  }).join('');
+  watch($('grid'));
+}
+function reroll(){ P.forEach(function(p){ p.r = Math.random(); }); }
+function refreshAll(){ buildP(); renderHero(); renderChips(); renderGrid(); renderMarquee(); renderMomen(); }
+function renderAll(){
+  buildP(); applyLook(); renderHero(); renderMarquee(); renderMomen(); renderApps(); renderChips(); renderGrid();
+  au.src = asset(CFG.track.file || 'audio/lagu.mp3');
+  syncControls(); syncPlay(); tick();
+  $('enter').disabled = false; $('enterQuiet').disabled = false; $('enter').lastChild.nodeValue = 'Buka dengan musik';
+}
+
+/* ---------- penampil foto ---------- */
+var lb = { list:[], i:0, timer:null, playing:false, last:null, armDel:false };
+function lbShow(){
+  var p = lb.list[lb.i]; if (!p) return;
+  var img = $('lbImg'); img.classList.add('sw');
+  setTimeout(function(){ img.src = p.src; img.alt = p.a; img.classList.remove('sw'); }, 140);
+  $('lbCount').textContent = (lb.i + 1) + ' / ' + lb.list.length;
+  $('lbT').textContent = p.title; $('lbTg').textContent = p.t.join(' · ');
+  $('lbTitle').value = p.title; $('lbTags').value = p.t.join(', ');
+  lb.armDel = false; $('lbDelete').textContent = 'Hapus';
+}
+function lbOpen(L, i){
+  lb.list = L; lb.i = i; lb.last = document.activeElement;
+  var el = $('lb'); el.hidden = false; el.classList.toggle('adm', !!AD); $('lbEdit').hidden = !AD; R.classList.add('locked');
+  var p = L[i]; $('lbImg').src = p.src; $('lbImg').alt = p.a;
+  lbShow();
+  requestAnimationFrame(function(){ el.classList.add('open'); $('lbX').focus(); });
+}
+function lbClose(){
+  lbStop(); var el = $('lb'); el.classList.remove('open'); R.classList.remove('locked');
+  setTimeout(function(){ el.hidden = true; }, 400);
+  if (lb.last && lb.last.focus) lb.last.focus();
+}
+function lbGo(d){ lb.i = (lb.i + d + lb.list.length) % lb.list.length; lbShow(); if (lb.playing) lbSchedule(); }
+function lbSchedule(){ clearInterval(lb.timer); lb.timer = setInterval(function(){ lbGo(1); }, 3600); }
+function lbStart(){ lb.playing = true; $('lbPlay').firstElementChild.firstElementChild.setAttribute('href', '#i-pause'); lbSchedule(); }
+function lbStop(){ lb.playing = false; clearInterval(lb.timer); $('lbPlay').firstElementChild.firstElementChild.setAttribute('href', '#i-play'); }
+$('lbX').onclick = lbClose;
+$('lbPrev').onclick = function(){ lbGo(-1); };
+$('lbNext').onclick = function(){ lbGo(1); };
+$('lbPlay').onclick = function(){ lb.playing ? lbStop() : lbStart(); };
+(function(){
+  var sx = null, st = $('stage');
+  st.addEventListener('pointerdown', function(e){ sx = e.clientX; });
+  st.addEventListener('pointerup', function(e){
+    if (sx === null) return; var dx = e.clientX - sx; sx = null;
+    if (Math.abs(dx) > 50) lbGo(dx < 0 ? 1 : -1); else if (e.target === st) lbClose();
+  });
+})();
+document.addEventListener('keydown', function(e){
+  var t = e.target && e.target.tagName;
+  if (!$('lb').hidden){
+    if (e.key === 'Escape') lbClose();
+    else if (t !== 'INPUT'){ if (e.key === 'ArrowRight') lbGo(1); else if (e.key === 'ArrowLeft') lbGo(-1); }
+  } else if (e.key === 'Escape') closeSheets();
+});
+$('grid').addEventListener('click', function(e){
+  var b = e.target.closest('.ph'); if (!b) return;
+  var i = cur.findIndex(function(p){ return p.id === b.dataset.id; }); if (i > -1) lbOpen(cur.slice(), i);
+});
+$('cards').addEventListener('click', function(e){
+  var b = e.target.closest('.mc'); if (!b) return;
+  var i = P.findIndex(function(p){ return p.id === b.dataset.id; }); if (i > -1) lbOpen(P.slice(), i);
+});
+$('chips').addEventListener('click', function(e){
+  var b = e.target.closest('.chip'); if (!b) return;
+  album = b.dataset.a; renderChips(); renderGrid();
+});
+
+/* ---------- musik ---------- */
+function fmt(t){ if (!isFinite(t)) return '0:00'; return Math.floor(t / 60) + ':' + pad(Math.floor(t % 60)); }
+function setRange(el){ if (el) el.style.setProperty('--v', (el.value - el.min) / (el.max - el.min) * 100 + '%'); }
+function syncPlay(){
+  var on = !au.paused;
+  document.querySelector('#pPlay use').setAttribute('href', on ? '#i-pause' : '#i-play');
+  $('rightPill').classList.toggle('playing', on);
+  var mp = $('mPlay'); if (mp) mp.firstElementChild.firstElementChild.setAttribute('href', on ? '#i-pause' : '#i-play');
+}
+function playNow(){ var pr = au.play(); if (pr && pr.catch) pr.catch(function(){}); }
+function toggleMusic(){ if (au.paused) playNow(); else au.pause(); }
+au.addEventListener('play', syncPlay); au.addEventListener('pause', syncPlay);
+au.addEventListener('loadedmetadata', function(){ $('pDur').textContent = fmt(au.duration); });
+au.addEventListener('timeupdate', function(){
+  $('pCur').textContent = fmt(au.currentTime);
+  if (au.duration){ $('pSeek').value = au.currentTime / au.duration * 1000; setRange($('pSeek')); }
+});
+$('pSeek').addEventListener('input', function(){ if (au.duration) au.currentTime = this.value / 1000 * au.duration; setRange(this); });
+$('pPlay').onclick = toggleMusic; $('bMusic').onclick = toggleMusic;
+$('pLoop').onclick = function(){ S.loop = !S.loop; save(); syncControls(); applyLook(); };
+$('pVol').addEventListener('input', function(){ S.vol = +this.value; setRange(this); applyLook(); save(); var v = $('mVol'); if (v){ v.value = S.vol; setRange(v); } });
+function syncControls(){
+  $('pLoop').setAttribute('aria-pressed', String(!!S.loop));
+  $('pVol').value = S.vol; setRange($('pVol')); setRange($('pSeek'));
+}
+
+/* ---------- layar kunci ---------- */
+function unlock(withMusic){
+  if (withMusic) playNow();
+  var l = $('lock'); l.classList.add('out'); R.classList.remove('locked');
+  setTimeout(function(){ l.hidden = true; l.style.display = 'none'; }, 1050);
+  document.querySelectorAll('.rv').forEach(function(el){ io.unobserve(el); io.observe(el); });
+}
+$('enter').onclick = function(){ unlock(true); };
+$('enterQuiet').onclick = function(){ unlock(false); };
+
+/* ---------- navigasi ---------- */
+function goTo(id){ var el = $(id); if (el) el.scrollIntoView({ behavior: S.motion === 'off' ? 'auto' : 'smooth', block:'start' }); }
+document.querySelectorAll('[data-go]').forEach(function(b){ b.onclick = function(){ goTo(b.dataset.go); }; });
+$('dock').addEventListener('click', function(e){ var a = e.target.closest('a'); if (!a) return; e.preventDefault(); goTo(a.dataset.s); });
+var secIO = new IntersectionObserver(function(es){
+  es.forEach(function(e){ if (e.isIntersecting){
+    document.querySelectorAll('#dock a').forEach(function(a){ a.classList.toggle('on', a.dataset.s === e.target.id); });
+  } });
+}, { rootMargin:'-45% 0px -50% 0px' });
+['beranda','galeri','momen','musik','sosmed'].forEach(function(id){ secIO.observe($(id)); });
+var sp = false;
+addEventListener('scroll', function(){
+  if (sp || S.motion === 'off') return; sp = true;
+  requestAnimationFrame(function(){ R.style.setProperty('--sy', Math.round(scrollY)); sp = false; });
+}, { passive:true });
+
+/* ---------- panel menu (pengunjung) ---------- */
+function openSheet(id){ closeSheets(true); $(id).classList.add('open'); $(id).setAttribute('aria-hidden', 'false'); $('scrim').classList.add('open'); R.classList.add('locked'); setTimeout(function(){ var x = $(id).querySelector('.ibtn'); if (x) x.focus(); }, 300); }
+function closeSheets(keepLock){
+  ['sheet','asheet'].forEach(function(id){ $(id).classList.remove('open'); $(id).setAttribute('aria-hidden', 'true'); });
+  $('scrim').classList.remove('open'); if (!keepLock) R.classList.remove('locked');
+}
+function seg(k, opts){
+  return '<div class="seg" role="group">' + opts.map(function(o){ return '<button type="button" data-k="' + k + '" data-v="' + o[0] + '" aria-pressed="' + (String(S[k]) === String(o[0])) + '">' + o[1] + '</button>'; }).join('') + '</div>';
+}
+function renderSheet(){
+  $('sheet').innerHTML =
+    '<div class="shead"><h2>Pengaturan</h2><button class="ibtn" id="shX" type="button" aria-label="Tutup menu"><svg class="i"><use href="#i-x"/></svg></button></div>' +
+    '<div class="gl">Tampilan</div><div class="grp">' +
+      '<div class="row"><span>Tema</span>' + seg('look', [['dark','Gelap'],['light','Terang']]) + '</div>' +
+      '<div class="row"><span>Animasi</span>' + seg('motion', [['on','Halus'],['off','Mati']]) + '</div>' +
+      '<div class="row"><span>Format jam</span>' + seg('h24', [['true','24 jam'],['false','12 jam']]) + '</div>' +
+    '</div>' +
+    '<div class="gl">Galeri</div><div class="grp">' +
+      '<div class="row"><span>Ukuran foto</span>' + seg('size', [['s','Kecil'],['m','Sedang'],['l','Besar']]) + '</div>' +
+      '<div class="row"><span>Susunan</span>' + seg('layout', [['masonry','Mengalir'],['rapi','Rapi']]) + '</div>' +
+      '<div class="row"><span>Urutan</span>' + seg('order', [['asli','Asli'],['acak','Acak']]) + '</div>' +
+      '<div class="row"><span>Slideshow</span><button class="mini" type="button" id="mSlide">Mulai</button></div>' +
+    '</div>' +
+    '<div class="gl">Musik</div><div class="grp">' +
+      '<div class="row"><span>Putar / jeda</span><button class="mini" type="button" id="mPlay"><svg class="i"><use href="#' + (au.paused ? 'i-play' : 'i-pause') + '"/></svg></button></div>' +
+      '<div class="row"><span>Ulangi lagu</span>' + seg('loop', [['true','Ya'],['false','Tidak']]) + '</div>' +
+      '<div class="row"><span>Volume</span><input type="range" id="mVol" min="0" max="100" value="' + S.vol + '" style="max-width:170px" aria-label="Volume"></div>' +
+    '</div>' +
+    '<div class="gl">Lainnya</div><div class="grp"><div class="row"><span>Kembalikan pengaturan tampilan</span><button class="mini" type="button" id="mReset">Reset</button></div></div>';
+  setRange($('mVol'));
+}
+$('bMenu').onclick = function(){ renderSheet(); openSheet('sheet'); };
+$('scrim').onclick = function(){ closeSheets(); };
+$('sheet').addEventListener('click', function(e){
+  var t = e.target.closest('button'); if (!t) return;
+  if (t.id === 'shX') return closeSheets();
+  if (t.id === 'mPlay') return toggleMusic();
+  if (t.id === 'mSlide'){ closeSheets(); setTimeout(function(){ var L = list(); if (L.length){ lbOpen(L.slice(), 0); lbStart(); } }, 450); return; }
+  if (t.id === 'mReset'){ S = Object.assign({}, DEF); save(); applyLook(); syncControls(); renderChips(); renderGrid(); renderSheet(); tick(); return; }
+  if (t.dataset.k){
+    var k = t.dataset.k, v = t.dataset.v;
+    if (k === 'h24' || k === 'loop') v = (v === 'true');
+    S[k] = v; save();
+    if (k === 'order'){ if (v === 'acak') reroll(); renderGrid(); }
+    applyLook(); syncControls(); tick(); renderSheet();
+  }
+});
+$('sheet').addEventListener('input', function(e){
+  if (e.target.id === 'mVol'){ S.vol = +e.target.value; setRange(e.target); applyLook(); syncControls(); save(); }
+});
+
+/* ======================================================================
+   MODE ADMIN: login pemilik pakai token GitHub, simpan lewat GitHub API
+   ====================================================================== */
+var AD = null, busy = false;
+function loadAdmin(){
+  try { var v = localStorage.getItem(AKEY) || sessionStorage.getItem(AKEY); if (v) AD = JSON.parse(v); } catch(e){ AD = null; }
+  if (AD && !(AD.token && AD.owner && AD.repo)) AD = null;
+  R.classList.toggle('is-admin', !!AD);
+}
+function storeAdmin(remember){
+  try { localStorage.removeItem(AKEY); sessionStorage.removeItem(AKEY); (remember ? localStorage : sessionStorage).setItem(AKEY, JSON.stringify(AD)); } catch(e){}
+}
+function guess(){
+  var h = location.hostname, o = '', r = '';
+  if (/\.github\.io$/i.test(h)){
+    o = h.split('.')[0];
+    var seg = location.pathname.split('/').filter(Boolean)[0];
+    r = (seg && !/\.html?$/i.test(seg)) ? seg : (o + '.github.io');
+  }
+  return { owner:o, repo:r, branch:'main' };
+}
+function ghUrl(path){ return 'https://api.github.com/repos/' + encodeURIComponent(AD.owner) + '/' + encodeURIComponent(AD.repo) + '/contents/' + path.split('/').map(encodeURIComponent).join('/'); }
+function ghHead(json){ var h = { 'Authorization':'Bearer ' + AD.token, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28' }; if (json) h['Content-Type'] = 'application/json'; return h; }
+function msgFor(s, m){
+  if (s === 401) return 'Token salah atau sudah kedaluwarsa.';
+  if (s === 403) return 'Token tidak punya izin menulis. Pastikan permission "Contents: Read and write".';
+  if (s === 404) return 'Repo atau branch tidak ditemukan. Cek pemilik, nama repo, dan branch.';
+  if (s === 409 || s === 422) return 'Data di GitHub berubah saat disimpan. Coba lagi.';
+  return 'GitHub menolak permintaan (' + s + '). ' + (m || '');
+}
+function ghFail(r){ return r.json().catch(function(){ return {}; }).then(function(j){ var e = new Error(msgFor(r.status, j.message)); e.status = r.status; throw e; }); }
+function ghGet(path){
+  return fetch(ghUrl(path) + '?ref=' + encodeURIComponent(AD.branch), { headers:ghHead(), cache:'no-store' })
+    .then(function(r){ if (r.status === 404) return null; if (!r.ok) return ghFail(r); return r.json(); });
+}
+async function putFile(path, b64, msg){
+  for (var t = 0; t < 3; t++){
+    var curr = await ghGet(path);
+    var body = { message:msg, content:b64, branch:AD.branch }; if (curr && curr.sha) body.sha = curr.sha;
+    var r = await fetch(ghUrl(path), { method:'PUT', headers:ghHead(true), body:JSON.stringify(body) });
+    if (r.ok) return;
+    if (r.status !== 409 && r.status !== 422) await ghFail(r);
+  }
+  throw new Error('Gagal menyimpan, coba lagi.');
+}
+async function delFile(path, msg){
+  var curr = await ghGet(path); if (!curr) return;
+  var r = await fetch(ghUrl(path), { method:'DELETE', headers:ghHead(true), body:JSON.stringify({ message:msg, sha:curr.sha, branch:AD.branch }) });
+  if (!r.ok) await ghFail(r);
+}
+function textB64(s){ return btoa(unescape(encodeURIComponent(s))); }
+function blobB64(b){ return new Promise(function(res, rej){ var fr = new FileReader(); fr.onload = function(){ res(String(fr.result).split(',')[1]); }; fr.onerror = rej; fr.readAsDataURL(b); }); }
+function saveConfig(msg){ return putFile('config.json', textB64(JSON.stringify(cfgOut(), null, 2) + '\n'), msg || 'Update galeri'); }
+function netMsg(e){ return (e && e.status) ? e.message : (e && e.name === 'TypeError' ? 'Tidak bisa terhubung ke GitHub. Buka website dari alamat github.io dan cek koneksi.' : ((e && e.message) || 'Terjadi kesalahan.')); }
+function setMsg(t, kind){ var m = $('aMsg'); if (m){ m.textContent = t || ''; m.className = 'amsg' + (kind ? ' ' + kind : ''); } }
+function field(label, id, type, val, ph){
+  return '<div class="row"><div class="fld"><label for="' + id + '">' + label + '</label><input type="' + type + '" id="' + id + '" value="' + esc(val) + '"' + (ph ? ' placeholder="' + esc(ph) + '"' : '') + ' autocomplete="off" autocapitalize="off" spellcheck="false"></div></div>';
+}
+function sUrl(key){ var s = CFG.sosmed.filter(function(x){ return x.key === key; })[0]; return s ? s.url : ''; }
+function renderAdmin(){
+  var a = $('asheet');
+  var head = '<div class="shead"><h2>Admin</h2><button class="ibtn" id="aX" type="button" aria-label="Tutup"><svg class="i"><use href="#i-x"/></svg></button></div>';
+  if (!AD){
+    var g = guess();
+    a.innerHTML = head +
+      '<p class="help">Khusus pemilik website. Login memakai token GitHub, jadi perubahan tersimpan permanen di repo dan nggak bisa diubah pengunjung.</p>' +
+      (PREVIEW ? '<p class="help">Ini pratinjau di Claude. Login admin baru jalan setelah website di-upload ke GitHub Pages.</p>' : '') +
+      '<div class="gl">Login pemilik</div><div class="grp">' +
+        field('Pemilik repo (username GitHub)', 'aOwner', 'text', g.owner) + field('Nama repo', 'aRepo', 'text', g.repo) + field('Branch', 'aBranch', 'text', g.branch) +
+        field('Token GitHub', 'aTok', 'password', '', 'github_pat_...') +
+        '<div class="row"><label class="chk"><input type="checkbox" id="aRem" checked> Ingat di perangkat ini</label></div>' +
+      '</div><p class="amsg" id="aMsg" role="status"></p>' +
+      '<div class="acts" style="margin-top:14px"><button class="btn" id="aLogin" type="button"' + (PREVIEW ? ' disabled' : '') + '>Masuk</button></div>';
+    return;
+  }
+  var n = names();
+  a.innerHTML = head +
+    '<p class="help">Masuk sebagai <b>' + esc(AD.owner) + '/' + esc(AD.repo) + '</b> (' + esc(AD.branch) + ').</p>' +
+    '<div class="gl">Profil</div><div class="grp">' + field('Nama pertama', 'aN1', 'text', n[0]) + field('Nama kedua', 'aN2', 'text', n[1]) + field('Tanggal jadian', 'aSince', 'date', CFG.since) + '</div>' +
+    '<div class="gl">Lagu</div><div class="grp">' + field('Judul', 'aTT', 'text', CFG.track.title) + field('Artis / keterangan', 'aTA', 'text', CFG.track.artist) +
+      '<div class="row"><span>File lagu</span><button class="mini" type="button" id="aAud">Ganti lagu</button></div></div>' +
+    '<div class="gl">Sosial media</div><div class="grp">' +
+      field('Instagram (username atau link)', 'aIG', 'text', sUrl('instagram'), 'username') + field('TikTok (username atau link)', 'aTK', 'text', sUrl('tiktok'), 'username') + field('WhatsApp (nomor atau link)', 'aWA', 'text', sUrl('whatsapp'), '0812xxxxxxx') +
+    '</div>' +
+    '<div class="gl">Foto</div><div class="grp">' + field('Album untuk foto baru (pisahkan koma)', 'aTags', 'text', '', 'Berdua, Bandung') +
+      '<div class="row"><span>Tambah foto</span><button class="mini" type="button" id="aPick">Pilih foto</button></div></div>' +
+    '<p class="help">Untuk mengubah judul, album, atau menghapus satu foto: buka fotonya di galeri.</p>' +
+    '<p class="amsg" id="aMsg" role="status"></p>' +
+    '<div class="acts" style="margin-top:14px"><button class="btn" id="aSave" type="button">Simpan perubahan</button><button class="btn ghost" id="aOut" type="button">Keluar</button></div>' +
+    '<p class="help">Setelah disimpan, pengunjung melihat perubahannya sekitar 1 menit kemudian (GitHub Pages sedang memproses).</p>';
+}
+function setBusy(b){ busy = b; document.querySelectorAll('#asheet .btn, #asheet .mini, #lbEdit button').forEach(function(x){ x.disabled = b; }); }
+async function login(){
+  var o = $('aOwner').value.trim(), r = $('aRepo').value.trim(), b = ($('aBranch').value.trim() || 'main'), t = $('aTok').value.trim();
+  if (!o || !r || !t){ setMsg('Isi pemilik, nama repo, dan token.', 'err'); return; }
+  setBusy(true); setMsg('Memeriksa token...');
+  try {
+    var res = await fetch('https://api.github.com/repos/' + encodeURIComponent(o) + '/' + encodeURIComponent(r), { headers:{ 'Authorization':'Bearer ' + t, 'Accept':'application/vnd.github+json', 'X-GitHub-Api-Version':'2022-11-28' } });
+    if (!res.ok) await ghFail(res);
+    var j = await res.json();
+    if (!j.permissions || !j.permissions.push) throw new Error('Token ini tidak punya izin menulis ke repo.');
+    AD = { owner:o, repo:r, branch:b, token:t }; storeAdmin($('aRem').checked);
+    R.classList.add('is-admin'); setBusy(false); renderAdmin(); setMsg('Berhasil masuk.', 'ok');
+  } catch(e){ setBusy(false); setMsg(netMsg(e), 'err'); }
+}
+function logout(){
+  AD = null; try { localStorage.removeItem(AKEY); sessionStorage.removeItem(AKEY); } catch(e){}
+  R.classList.remove('is-admin'); renderAdmin();
+}
+function addTags(tags){ tags.forEach(function(t){ if (CFG.albums.indexOf(t) < 0) CFG.albums.push(t); }); }
+function parseTags(s){ return String(s || '').split(',').map(function(x){ return x.trim(); }).filter(Boolean).filter(function(x, i, a){ return a.indexOf(x) === i; }); }
+async function saveFields(){
+  setBusy(true); setMsg('Menyimpan...');
+  try {
+    var n = names();
+    CFG.names = [$('aN1').value.trim() || n[0], $('aN2').value.trim() || n[1]];
+    CFG.since = $('aSince').value;
+    CFG.track.title = $('aTT').value.trim() || CFG.track.title; CFG.track.artist = $('aTA').value.trim();
+    CFG.sosmed = [ { key:'instagram', label:'Instagram', url:normUrl('instagram', $('aIG').value) }, { key:'tiktok', label:'TikTok', url:normUrl('tiktok', $('aTK').value) }, { key:'whatsapp', label:'WhatsApp', url:normUrl('whatsapp', $('aWA').value) } ];
+    await saveConfig('Update profil, lagu, dan sosial media');
+    applyLook(); renderApps(); tick(); setBusy(false);
+    setMsg('Tersimpan di GitHub. Pengunjung melihatnya sekitar 1 menit lagi.', 'ok');
+  } catch(e){ setBusy(false); setMsg(netMsg(e), 'err'); }
+}
+function normUrl(key, v){
+  v = String(v || '').trim(); if (!v) return '';
+  if (/^https?:\/\//i.test(v)) return v.replace(/^http:/i, 'https:');
+  if (key === 'whatsapp'){ var d = v.replace(/[^\d]/g, ''); if (d.indexOf('0') === 0) d = '62' + d.slice(1); return d ? 'https://wa.me/' + d : ''; }
+  var u = v.replace(/^@/, '').replace(/\s/g, '');
+  if (key === 'instagram') return 'https://www.instagram.com/' + u;
+  if (key === 'tiktok') return 'https://www.tiktok.com/@' + u;
+  return 'https://' + v;
+}
+function shrink(file){
+  return new Promise(function(res, rej){
+    var u = URL.createObjectURL(file), im = new Image();
+    im.onload = function(){
+      var sc = Math.min(1, 1600 / Math.max(im.naturalWidth, im.naturalHeight));
+      var c = document.createElement('canvas'); c.width = Math.round(im.naturalWidth * sc); c.height = Math.round(im.naturalHeight * sc);
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      c.toBlob(function(b){ URL.revokeObjectURL(u); b ? res({ blob:b, w:c.width, h:c.height }) : rej(new Error('Foto tidak bisa diproses.')); }, 'image/jpeg', .84);
+    };
+    im.onerror = function(){ URL.revokeObjectURL(u); rej(new Error('File bukan gambar yang valid.')); }; im.src = u;
+  });
+}
+async function addPhotos(files){
+  if (!AD || !files.length) return;
+  var tags = parseTags($('aTags') ? $('aTags').value : ''); if (!tags.length) tags = ['Baru'];
+  setBusy(true); var done = 0;
+  try {
+    for (var i = 0; i < files.length; i++){
+      setMsg('Mengunggah foto ' + (i + 1) + ' dari ' + files.length + '...');
+      var s = await shrink(files[i]);
+      var path = 'photos/' + Date.now().toString(36) + '-' + i + '.jpg';
+      await putFile(path, await blobB64(s.blob), 'Tambah foto');
+      CFG.photos.push({ file:path, w:s.w, h:s.h, title:'Foto baru', alt:'Foto baru', tags:tags.slice(), local:URL.createObjectURL(s.blob) });
+      done++;
+    }
+    addTags(tags);
+    setMsg('Menyimpan daftar foto...'); await saveConfig('Tambah ' + done + ' foto');
+    refreshAll(); setBusy(false); setMsg(done + ' foto ditambahkan. Pengunjung melihatnya sekitar 1 menit lagi.', 'ok');
+  } catch(e){
+    if (done){ addTags(tags); try { await saveConfig('Tambah ' + done + ' foto'); } catch(x){} refreshAll(); }
+    setBusy(false); setMsg(netMsg(e), 'err');
+  }
+}
+async function changeAudio(file){
+  if (!AD || !file) return;
+  if (file.size > 20 * 1024 * 1024){ setMsg('File lagu terlalu besar (maksimal 20 MB).', 'err'); return; }
+  setBusy(true); setMsg('Mengunggah lagu...');
+  try {
+    await putFile('audio/lagu.mp3', await blobB64(file), 'Ganti lagu');
+    CFG.track.file = 'audio/lagu.mp3'; await saveConfig('Ganti lagu');
+    au.src = URL.createObjectURL(file); setBusy(false); setMsg('Lagu diganti. Pengunjung mendengarnya sekitar 1 menit lagi.', 'ok');
+  } catch(e){ setBusy(false); setMsg(netMsg(e), 'err'); }
+}
+$('adminLink').onclick = function(){ renderAdmin(); openSheet('asheet'); };
+$('asheet').addEventListener('click', function(e){
+  var t = e.target.closest('button'); if (!t || busy) return;
+  if (t.id === 'aX') return closeSheets();
+  if (t.id === 'aLogin') return login();
+  if (t.id === 'aOut') return logout();
+  if (t.id === 'aSave') return saveFields();
+  if (t.id === 'aPick') return $('fileIn').click();
+  if (t.id === 'aAud') return $('audIn').click();
+});
+$('asheet').addEventListener('keydown', function(e){ if (e.key === 'Enter' && e.target.id === 'aTok') login(); });
+$('fileIn').addEventListener('change', function(){ var f = Array.prototype.slice.call(this.files || []); this.value = ''; addPhotos(f); });
+$('audIn').addEventListener('change', function(){ var f = this.files && this.files[0]; this.value = ''; changeAudio(f); });
+
+/* edit satu foto dari penampil */
+$('lbSave').onclick = async function(){
+  if (!AD || busy) return; var p = lb.list[lb.i]; if (!p) return;
+  var item = CFG.photos.filter(function(x){ return x.file === p.file; })[0]; if (!item) return;
+  var tags = parseTags($('lbTags').value);
+  item.title = $('lbTitle').value.trim() || item.title; item.alt = item.title; item.tags = tags; addTags(tags);
+  $('lbNote').textContent = 'Menyimpan...'; setBusy(true);
+  try {
+    await saveConfig('Edit foto');
+    refreshAll(); lb.list = lb.list.map(function(o){ return byFile(o.file); }).filter(Boolean); lbShow();
+    $('lbNote').textContent = 'Tersimpan.';
+  } catch(e){ $('lbNote').textContent = netMsg(e); }
+  setBusy(false);
+};
+$('lbDelete').onclick = async function(){
+  if (!AD || busy) return; var p = lb.list[lb.i]; if (!p) return;
+  if (!lb.armDel){ lb.armDel = true; this.textContent = 'Yakin hapus?'; return; }
+  $('lbNote').textContent = 'Menghapus...'; setBusy(true);
+  try {
+    if (!/^data:|^blob:/.test(p.file)) await delFile(p.file, 'Hapus foto');
+    CFG.photos = CFG.photos.filter(function(x){ return x.file !== p.file; });
+    CFG.hero = CFG.hero.filter(function(f){ return f !== p.file; });
+    CFG.moments = CFG.moments.filter(function(m){ return m.file !== p.file; });
+    if (CFG.cover === p.file) CFG.cover = '';
+    await saveConfig('Hapus foto');
+    refreshAll();
+    lb.list = lb.list.map(function(o){ return byFile(o.file); }).filter(Boolean);
+    $('lbNote').textContent = '';
+    if (!lb.list.length){ setBusy(false); lbClose(); return; }
+    lb.i = Math.min(lb.i, lb.list.length - 1); lbShow();
+  } catch(e){ $('lbNote').textContent = netMsg(e); }
+  setBusy(false);
+};
+
+/* ---------- mulai ---------- */
+R.classList.add('locked');
+loadAdmin(); applyLook(); tick(); setInterval(tick, 1000);
+$('enter').disabled = true; $('enterQuiet').disabled = true;
+loadCfg().then(function(c){
+  CFG = normalize(c);
+  renderAll(); watch(document);
+  if (AD) renderAdmin();
+});
+})();
+
+</script>
+</body>
+</html>
